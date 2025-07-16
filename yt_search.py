@@ -29,7 +29,6 @@ for i, video in enumerate(videos_search):
     url_suffix = video['url_suffix']
     print(f"\n[{i+1}] Downloading: {title}")
     try:
-        #ydl = yt_dlp.YoutubeDL(ydl_opts)
         ydl.download(['https://www.youtube.com' + url_suffix])
     except Exception as e: # Catching a general exception and storing it in 'e'
         print(f"An error occurred: {e}")
