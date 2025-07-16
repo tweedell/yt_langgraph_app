@@ -5,7 +5,7 @@ import csv
 # Step 1: Define the search term and number of videos
 SEARCH_TERM = "Ukrainian drone footage"
 MAX_RESULTS = 2  # You can increase this
-CSV_FILE = "yt_dl_metadata.csv"
+CSV_FILE = "/home/andrew/Tweedell/Sandtable/YT_LangGraph_App/yt_langgraph_app/Videos/yt_dl_metadata.csv"
 
 # Step 2: Search YouTube
 print(f"Searching YouTube for: {SEARCH_TERM}")
@@ -27,7 +27,7 @@ ydl = yt_dlp.YoutubeDL(ydl_opts)
 
 # Step 4: Download each video using yt-dlp
 
-metadata_fields = ['title', 'channel', 'duration', 'views', 'published', 'link']
+metadata_fields = ['id', 'title', 'channel', 'duration', 'views', 'published', 'url', 'long_desc']
 
 with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as csvfile:
     
@@ -37,16 +37,18 @@ with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as csvfile:
     for i, video in enumerate(videos_search):
         
         title = video['title']
-        url_suffix = video['url_suffix']
-        channel = video['channel']['name']
-        duration = video.get('duration', 'N/A')
-        views = video.get('viewCount', {}).get('short', 'N/A')
-        published = video.get('publishedTime', 'N/A')
+        url = 'https://www.youtube.com' + video['url_suffix']
+        id = video['id']
+        channel = video['channel']
+        duration = video['duration']
+        views = video['views']
+        published = video['publish_time']
+        long_desc = video['long_desc']
 
         print(f"\n[{i+1}] Downloading: {title}")
         
         try:
-            ydl.download(['https://www.youtube.com' + url_suffix])
+            ydl.download([url])
         except Exception as e: # Catching a general exception and storing it in 'e'
             print(f"An error occurred: {e}")
         else:
@@ -54,4 +56,15 @@ with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as csvfile:
         finally:
             print(f"Program execution complete.")
 
+        # Write metadata to CSV
+        writer.writerow({'id':id,
+                        'title': title,
+                        'channel': channel,
+                        'duration': duration,
+                        'views': views,
+                        'published': published,
+                        'long_desc':long_desc,
+                        'url': url
+                        })
 
+print(f"\nMetadata saved to: {CSV_FILE}")
