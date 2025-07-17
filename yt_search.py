@@ -8,7 +8,7 @@ from pathlib import Path
 
 # Step 1: Define the search term and number of videos
 SEARCH_TERM = "Ukraine drone POV"
-MAX_RESULTS = 2  # You can increase this
+MAX_RESULTS = 1  # You can increase this
 CSV_FILE = "/home/andrew/Tweedell/Sandtable/YT_LangGraph_App/yt_langgraph_app/Videos/yt_dl_metadata.csv"
 SUBTITLE_LANG = "en"  # You can change to 'uk', 'ru', or 'all'
 SUBTITLE_FORMAT = "srt"  # 'srt' or 'vtt'

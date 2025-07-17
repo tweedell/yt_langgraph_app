@@ -1,0 +1,12 @@
+youtube-search
+sentence-transformers
+yt-dlp
+csv
+srt
+streamlit
+langchain
+langchain-openai
+langchain-chroma
+langgraph
+tiktoken
+torch
