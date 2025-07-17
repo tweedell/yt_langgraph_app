@@ -3,9 +3,11 @@ import yt_dlp
 import csv
 
 # Step 1: Define the search term and number of videos
-SEARCH_TERM = "military decision making"
-MAX_RESULTS = 5  # You can increase this
+SEARCH_TERM = "Ukraine drones"
+MAX_RESULTS = 2  # You can increase this
 CSV_FILE = "/home/andrew/Tweedell/Sandtable/YT_LangGraph_App/yt_langgraph_app/Videos/yt_dl_metadata.csv"
+SUBTITLE_LANG = "en"  # You can change to 'uk', 'ru', or 'all'
+SUBTITLE_FORMAT = "srt"  # 'srt' or 'vtt'
 
 # Step 2: Search YouTube
 print(f"Searching YouTube for: {SEARCH_TERM}")
@@ -17,17 +19,27 @@ ydl_opts = {
             'format': 'best',
             'outtmpl': '%(title)s-%(id)s.%(ext)s',
             'paths': {'home': '/home/andrew/Tweedell/Sandtable/YT_LangGraph_App/yt_langgraph_app/Videos'},
-            'writesubs': True,
-            'subtitlesformat': 'srt',        # Specify the desired format (e.g., 'srt', 'vtt')
-            'subtitleslangs': ['en'],        # Specify the language(s) (e.g., 'en' for English)
-            'writeautomaticsubs': True       # Download automatically generated subtitles
+            'writesubtitles': True,
+            'subtitlesformat': SUBTITLE_FORMAT,        # Specify the desired format (e.g., 'srt', 'vtt')
+            'subtitleslangs': [SUBTITLE_LANG],        # Specify the language(s) (e.g., 'en' for English)
+            'writeautomaticsub': True       # Download automatically generated subtitles
             }
 
 ydl = yt_dlp.YoutubeDL(ydl_opts)
 
 # Step 4: Download each video using yt-dlp
 
-metadata_fields = ['id', 'title', 'channel', 'duration', 'views', 'published', 'url', 'long_desc', 'tags', 'dl_status']
+metadata_fields = ['id',
+                   'title',
+                   'channel',
+                   'duration',
+                   'views',
+                   'published',
+                   'url',
+                   'has_subs',
+                   'long_desc',
+                   'tags',
+                   'dl_status']
 
 with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as csvfile:
     
@@ -45,11 +57,16 @@ with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as csvfile:
         published = video['publish_time']
         long_desc = "N/A"
         tags = "N/A"
+        has_subs = False
+
+        # Prepare file-safe title
+        safe_title = "".join(c for c in title if c.isalnum() or c in " -_").rstrip()
 
         try:
             info = ydl.extract_info(url, download=False)
             long_desc = info.get('description', '').strip().replace('\n', ' ')[:500]
             tags = ", ".join(info.get('tags', []))
+            has_subs = True if 'subtitles' in info and info['subtitles'] else False
         except Exception as e:
             print(f"Failed to extract metadata: {e}")
 
@@ -75,6 +92,7 @@ with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as csvfile:
                         'published': published,
                         'dl_status': dl_status,
                         'tags': tags,
+                        'has_subs': has_subs,
                         'long_desc':long_desc,
                         'url': url
                         })
