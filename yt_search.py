@@ -3,8 +3,8 @@ import yt_dlp
 import csv
 
 # Step 1: Define the search term and number of videos
-SEARCH_TERM = "Ukrainian drone footage"
-MAX_RESULTS = 2  # You can increase this
+SEARCH_TERM = "military decision making"
+MAX_RESULTS = 5  # You can increase this
 CSV_FILE = "/home/andrew/Tweedell/Sandtable/YT_LangGraph_App/yt_langgraph_app/Videos/yt_dl_metadata.csv"
 
 # Step 2: Search YouTube
@@ -27,7 +27,7 @@ ydl = yt_dlp.YoutubeDL(ydl_opts)
 
 # Step 4: Download each video using yt-dlp
 
-metadata_fields = ['id', 'title', 'channel', 'duration', 'views', 'published', 'url', 'long_desc']
+metadata_fields = ['id', 'title', 'channel', 'duration', 'views', 'published', 'url', 'long_desc', 'tags', 'dl_status']
 
 with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as csvfile:
     
@@ -43,14 +43,24 @@ with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as csvfile:
         duration = video['duration']
         views = video['views']
         published = video['publish_time']
-        long_desc = video['long_desc']
+        long_desc = "N/A"
+        tags = "N/A"
+
+        try:
+            info = ydl.extract_info(url, download=False)
+            long_desc = info.get('description', '').strip().replace('\n', ' ')[:500]
+            tags = ", ".join(info.get('tags', []))
+        except Exception as e:
+            print(f"Failed to extract metadata: {e}")
 
         print(f"\n[{i+1}] Downloading: {title}")
         
         try:
             ydl.download([url])
+            dl_status = "Success"
         except Exception as e: # Catching a general exception and storing it in 'e'
             print(f"An error occurred: {e}")
+            dl_status = "Failed"
         else:
             print(f"Number successfully processed.")
         finally:
@@ -63,6 +73,8 @@ with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as csvfile:
                         'duration': duration,
                         'views': views,
                         'published': published,
+                        'dl_status': dl_status,
+                        'tags': tags,
                         'long_desc':long_desc,
                         'url': url
                         })
