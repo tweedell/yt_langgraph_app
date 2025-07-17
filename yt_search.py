@@ -1,6 +1,7 @@
 from youtube_search import YoutubeSearch
 import yt_dlp
 import csv
+import srt
 
 # Step 1: Define the search term and number of videos
 SEARCH_TERM = "Ukraine drones"
